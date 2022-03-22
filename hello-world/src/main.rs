@@ -1,5 +1,12 @@
 use std::fmt::Display;
 
+// for simple value-only, no-functionality structs, exposing fields can be OK
+pub struct Point {
+    pub x: i32,
+    pub y: i32,
+}
+
+
 #[derive(Debug)]
 struct SemVer {
     major: u16, // unsigned 16-bit integer
@@ -18,6 +25,10 @@ impl SemVer{
             patch,
         }
     }
+
+    fn info(&self) {
+        println!("I am a SemVer! major number: {}", self.major)
+    }
 }
 
 fn main() {
@@ -34,6 +45,9 @@ fn main() {
     println!("these are a few of my favorite things: {} {} {}", 
     a_big_int, less_precise_float, owned_string);
 
+    let generous_pi = 4.0;
+    say_hi_to_float(generous_pi); // note if this type doesn't match the function definition will not compile
+
     // not the best way to create instance of struct 
     let a_semver = SemVer{
         major: 1, 
@@ -42,9 +56,23 @@ fn main() {
         patch: Default::default(),
     };
 
+    // note that the println is a type of macro invocation 
    println!("printing out the semver: {:?}", a_semver);
    println!("printing out the semver: {:#?}", a_semver); // in order to pretty print this
 
+   a_semver.info();
+
+   let end_of_function: bool = true; 
+
+   if end_of_function {
+       println!("hurray!")
+   }
+
+   // this does pattern matching 
+    match end_of_function {
+        true => todo!(), // another macro that will panic if this doesn't happen
+        false => todo!()
+    }
 }
 
 // this is more natural 
@@ -60,4 +88,16 @@ struct ContainsString {
 struct UnergonomicWithLifetimes<'a> {
     member: &'a str,
     another_ref: &'a i32, 
+}
+
+fn say_hi_to_number(num: u8) {
+    println!("hi! {}", num)
+}
+
+fn say_hi_to_float(f: f32) {
+    println!("hi! {}", f)
+}
+
+fn say_hi_to_big_float(f: f64) {
+    println!("hi! {}", f)
 }

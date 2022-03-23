@@ -14,6 +14,19 @@ struct SemVer {
     patch: u16,
 }
 
+// This is similar to the idea of using iota to define types in Golang
+// Except we are using a separate type called enumerated types. 
+enum CrateKind {
+    Binary, 
+    Library, 
+    Other {description: String },
+}
+
+struct Crate {
+    version: SemVer, 
+    kind: CrateKind, // Rust string always valid utf-8
+}
+
 // impl lock for a struct
 impl SemVer{
     fn new(major: u16, minor:u16, patch: u16) -> Self {
@@ -69,9 +82,43 @@ fn main() {
    }
 
    // this does pattern matching 
-    match end_of_function {
-        true => todo!(), // another macro that will panic if this doesn't happen
-        false => todo!()
+    // match end_of_function {
+    //     true => todo!(), // another macro that will panic if this doesn't happen
+    //     false => todo!()
+    // }
+
+    let crt = Crate { 
+        version: SemVer::new(1, 0, 0), 
+        kind: CrateKind::Binary,
+    };
+
+    let new_Crt = Crate {
+        version: SemVer::new(1, 0, 0),
+        kind: CrateKind::Other {
+            description: "cat".to_string(),
+        },
+    };
+
+    match crt.kind {
+        CrateKind::Binary => println!("found a binary!"),
+        CrateKind::Library => println!("found a library"),
+        CrateKind::Other { description }=> {
+            if description == "alien" {
+                println!("wasn't expecting you here!");
+            } else {
+                println!("found nothing else: {}", description);
+            }
+        }
+    }
+
+    match new_Crt.kind {
+        CrateKind::Binary => println!("found a binary!"),
+        CrateKind::Library => println!("found a library"),
+        CrateKind::Other { description } => {
+            if description == "cat" {
+                println!("omg we found gatsby!");
+            }
+        }
     }
 }
 

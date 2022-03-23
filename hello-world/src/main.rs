@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display};
 
 // for simple value-only, no-functionality structs, exposing fields can be OK
 pub struct Point {
@@ -120,6 +120,46 @@ fn main() {
             }
         }
     }
+
+    // Can do number matching as well 
+    let num: u8 = 5; // Note this is the same as saying let num = 5_u8; 
+    
+    match num {
+        0..=4 => println!("this is a smaller number"),
+        5..=8 => println!("a bit larger of a number"), // note .. is for a range
+        9..=u8::MAX => println!("found the largest possible number"),
+    };
+
+    // Can also pattern match on a struct 
+    match a_semver {
+        SemVer {
+            major,
+            .. // ignore what we don't want
+        }  if major >= 1 => { 
+            println!("yay we are at least at major version 1");
+        }
+
+        _ => ()
+    };
+
+    let crt = Crate {
+        version: SemVer::new(1, 0, 0),
+        kind: CrateKind::Other {
+            description: "something else!".to_string(),
+        },
+    };
+
+    match crt {
+        Crate {
+            version: SemVer { major, .. },
+            ..
+        } if major == 0 => println!("deploy it ANYWAY"),
+        _ => (),
+    }
+    
+
+    
+
 }
 
 // this is more natural 

@@ -1,8 +1,6 @@
 use std::{
     fs::File,
-    io::{self, BufRead, BufReader, Lines, Read},
-    error::Error,
-    io::Error, 
+    io::BufReader,
     path::Path,
 };
 
@@ -38,7 +36,7 @@ impl SemVer {
 
 // the use of ? operator 
 // Result enum is the standard return type  
-fn read_user_from_file<P: AsRef<Path>>(path: P) -> Result<SemVer, Box<dyn Error>> {
+fn read_user_from_file<P: AsRef<Path>>(path: P) -> Result<SemVer, Box<dyn std::error::Error>> {
     // Open the file in read-only mode with buffer.
     let file = File::open(path)?;
     let reader = BufReader::new(file);
@@ -52,13 +50,14 @@ fn read_user_from_file<P: AsRef<Path>>(path: P) -> Result<SemVer, Box<dyn Error>
 
 // being explicit with error handling 
 // trying to bubble up errors by boxing them - this is what I'm having trouble with 
-fn read_user_from_file_explicitly<P: AsRef<Path>>(path: P) -> Result<SemVer,  Box<dyn Error>> {
+fn read_user_from_file_explicitly<P: AsRef<Path>>(path: P) -> Result<SemVer,  Box<dyn std::error::Error>> {
     // Open the file in read-only mode with buffer.
     let f = File::open(path);
 
     let f = match f {
         Ok(file) => file, 
-        Err(error) => return Box::new(error),
+        // need to return the boxed error inside of a new error 
+        Err(error) => return Err(Box::new(error)),
     };
 
     let reader = BufReader::new(f);
@@ -66,8 +65,9 @@ fn read_user_from_file_explicitly<P: AsRef<Path>>(path: P) -> Result<SemVer,  Bo
     // Read the JSON contents of the file as an instance of `User`.
     let result: Result<SemVer, _> = serde_json::from_reader(reader);
      match result {
-        Ok(semver) => semver,  
-        Err(err) =>  return Box::new(err),
+        Ok(semver) => Ok(semver),  
+        // need to return the box inside of a result 
+        Err(err) =>  return Err(Box::new(err)),
      }
 }
 
